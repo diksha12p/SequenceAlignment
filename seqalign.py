@@ -9,26 +9,23 @@ refDNA = "TCATAT"
 
 
 # The helper function to print out the score matrices
-def print_scores_matrix(matrix, rows, cols):
-    for i in range(rows):
-        for j in range(cols):
-            print(matrix[i][j])
-            print('\t')
-        print('\n')
+def print_scores_matrix(matrix):
+    for x in matrix:
+        print(*x, sep="\t")
 
 
 # The helper function to print out the matrices
 def print_matrix(ref_matrix):
     # Looping over all the rows
     for i in range(0, len(ref_matrix)):
-        print("["),
+        print("[")
         # Looping over each column present in row 'i'
         for j in range(0, len(ref_matrix[i])):
             # Printing out the values contained in (row,column) = (i,j)
-            print(ref_matrix[i][j]),
+            print(ref_matrix[i][j])
             # Adding a tab if not in the last column
             if j != len(ref_matrix[i]) - 1:
-                print("\t"),
+                print("\t")
         print("]\n")
 
 
@@ -134,7 +131,7 @@ def needleman_wunsch(testDNA, refDNA):
     align_storage1 = align_storage1[::-1]
     align_storage2 = align_storage2[::-1]
 
-    return (align_storage1, align_storage2, score, len_ref, len_test)
+    return (align_storage1, align_storage2, score)
 
 
 # Find longest common subsequence (LCS) of two strings
@@ -182,12 +179,14 @@ def print_lcs(seq1, seq2, table):
 # testDNA = ""
 print("Sequence 1 : ", testDNA)
 print("Sequence 2 : ", refDNA)
-output1, output2, score, rows, cols = needleman_wunsch(testDNA, refDNA)
-print_scores_matrix(score, rows, cols)
-print_matrix(needleman_wunsch(testDNA, refDNA))
+output1, output2, score = needleman_wunsch(testDNA, refDNA)
+# print_scores_matrix(score)
+print(output1)
+print(output2)
+print_scores_matrix(score)
 
 c = lcs(testDNA, refDNA)
-print('Longest Common Subsequence: '),
+print('Longest Common Subsequence: ', end="")
 print_lcs(testDNA, refDNA, c)
 
 # print(output1 + "\n" + output2)
