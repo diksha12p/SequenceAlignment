@@ -7,6 +7,16 @@ penalty_mismatch = -1
 testDNA = "GTCCATACA"
 refDNA = "TCATAT"
 
+
+# The helper function to print out the score matrices
+def print_scores_matrix(matrix, rows, cols):
+    for i in range(rows):
+        for j in range(cols):
+            print(matrix[i][j])
+            print('\t')
+        print('\n')
+
+
 # The helper function to print out the matrices
 def print_matrix(ref_matrix):
     # Looping over all the rows
@@ -20,6 +30,7 @@ def print_matrix(ref_matrix):
             if j != len(ref_matrix[i]) - 1:
                 print("\t"),
         print("]\n")
+
 
 # Function to develop a matrix of zeros
 def zeros(rows, cols):
@@ -36,6 +47,7 @@ def zeros(rows, cols):
     # Returning the matrix of zeros
     return retrive_value
 
+
 # Function for obtaining the score between any two bases in the given alignment
 def score_match(input1, input2):
     if input1 == input2:
@@ -45,14 +57,14 @@ def score_match(input1, input2):
     else:
         return penalty_mismatch
 
-def needleman_wunsch(testDNA, refDNA):
 
+def needleman_wunsch(testDNA, refDNA):
     # Storing the length of two input sequences
     len_test = len(testDNA)
     len_ref = len(refDNA)
 
     # Generating matrix of zeros to store scores
-    score = zeros(len_ref+1, len_test+1)
+    score = zeros(len_ref + 1, len_test + 1)
 
     # Calculate score table
 
@@ -68,7 +80,7 @@ def needleman_wunsch(testDNA, refDNA):
     for i in range(1, len_ref + 1):
         for j in range(1, len_test + 1):
             # Calculating the score by comparing the top, left, and diagonal cells
-            matches = score[i - 1][j - 1] + score_match(testDNA[j-1], refDNA[i-1])
+            matches = score[i - 1][j - 1] + score_match(testDNA[j - 1], refDNA[i - 1])
             deleted = score[i - 1][j] + penalty_gap
             inserted = score[i][j - 1] + penalty_gap
             # Record the maximum score from the three possible scores calculated above
@@ -87,34 +99,34 @@ def needleman_wunsch(testDNA, refDNA):
     # Using 'i' and 'j' for keeping a track of where we are in the matrix
     while i > 0 and j > 0:
         score_current = score[i][j]
-        score_diagonal = score[i-1][j-1]
-        score_up = score[i][j-1]
-        score_left = score[i-1][j]
+        score_diagonal = score[i - 1][j - 1]
+        score_up = score[i][j - 1]
+        score_left = score[i - 1][j]
 
         # Check to find out which cell the current score was calculated from
         # Eventually update i and j corresponding to that cell.
-        if score_current == score_diagonal + score_match(testDNA[j-1], refDNA[i-1]):
-            align_storage1 += testDNA[j-1]
-            align_storage2 += refDNA[i-1]
+        if score_current == score_diagonal + score_match(testDNA[j - 1], refDNA[i - 1]):
+            align_storage1 += testDNA[j - 1]
+            align_storage2 += refDNA[i - 1]
             i -= 1
             j -= 1
         elif score_current == score_up + penalty_gap:
-            align_storage1 += testDNA[j-1]
+            align_storage1 += testDNA[j - 1]
             align_storage2 += '-'
             j -= 1
         elif score_current == score_left + penalty_gap:
             align_storage1 += '-'
-            align_storage2 += refDNA[i-1]
+            align_storage2 += refDNA[i - 1]
             i -= 1
 
     # Finish the tracing up to the top left cell
     while j > 0:
-        align_storage1 += testDNA[j-1]
+        align_storage1 += testDNA[j - 1]
         align_storage2 += '-'
         j -= 1
     while i > 0:
         align_storage1 += '-'
-        align_storage2 += refDNA[i-1]
+        align_storage2 += refDNA[i - 1]
         i -= 1
 
     # Since the score matrix has been traversed from the bottom right, the two sequences will be reversed.
@@ -122,13 +134,14 @@ def needleman_wunsch(testDNA, refDNA):
     align_storage1 = align_storage1[::-1]
     align_storage2 = align_storage2[::-1]
 
-    return(align_storage1, align_storage2)
+    return (align_storage1, align_storage2, score, len_ref, len_test)
+
 
 # Find longest common subsequence (LCS) of two strings
 # Dynamic programming with top-down approach
 def lcs(seq1, seq2):
-    #Return c where c[i][j] contains length of LCS of u[i:] and v[j:]
-    table = [[-1]*(len(seq2) + 1) for _ in range(len(seq1) + 1)]
+    # Return c where c[i][j] contains length of LCS of u[i:] and v[j:]
+    table = [[-1] * (len(seq2) + 1) for _ in range(len(seq1) + 1)]
     lcs_helper(seq1, seq2, table, 0, 0)
     return table
 
@@ -167,9 +180,10 @@ def print_lcs(seq1, seq2, table):
 
 
 # testDNA = ""
-print "Sequence 1 : ", testDNA
-print "Sequence 2 : ", refDNA
-output1, output2 = needleman_wunsch(testDNA, refDNA)
+print("Sequence 1 : ", testDNA)
+print("Sequence 2 : ", refDNA)
+output1, output2, score, rows, cols = needleman_wunsch(testDNA, refDNA)
+print_scores_matrix(score, rows, cols)
 print_matrix(needleman_wunsch(testDNA, refDNA))
 
 c = lcs(testDNA, refDNA)
