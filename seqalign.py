@@ -4,8 +4,10 @@ award_match = 1
 penalty_mismatch = -1
 
 # Make a score matrix with these two sequences
-testDNA = "GTCCATACA"
-refDNA = "TCATAT"
+testDNA = "ccggggatgcgtgatgtttaagagttaaagcctggcctcccaaccgacat"
+refDNA = "agagcccatgttgtgcggtgtcgccatttcgggggccaaa"
+len_test = len(testDNA)
+len_ref = len(refDNA)
 
 
 # The helper function to print out the score matrices
@@ -165,28 +167,53 @@ def lcs_helper(seq1, seq2, table, i, j):
 def print_lcs(seq1, seq2, table):
     # Print one LCS of se1 and seq2 seq1sing table
     i = j = 0
+    list = []
     while not (i == len(seq1) or j == len(seq2)):
         if seq1[i] == seq2[j]:
-            print(seq1[i]),
+            list.append(seq1[i].capitalize())
             i += 1
             j += 1
         elif table[i][j + 1] > table[i + 1][j]:
             j += 1
         else:
             i += 1
+    return list
+
+
+def string_compare(s1, s2):
+    count = 0
+    gap_count = 0
+    for i, j in zip(s1, s2):
+        if i == '-' or j == '-':
+            gap_count += 1
+        if i == j:
+            count += 1
+    return count, gap_count
 
 
 # testDNA = ""
+print("#==============================================================================#")
 print("Sequence 1 : ", testDNA)
 print("Sequence 2 : ", refDNA)
+print("#==============================================================================#")
 output1, output2, score = needleman_wunsch(testDNA, refDNA)
-# print_scores_matrix(score)
-print(output1)
-print(output2)
+print("Globally aligned ref-DNA sequence : " + str(output1))
+print("Globally aligned test-DNA sequence : " + str(output2))
+print("#==============================================================================#")
 print_scores_matrix(score)
+cnt, gap_cnt = string_compare(output1, output2)
+similarity = cnt / len(output1)
+print("#==============================================================================#")
+print("Similarity : " + str(similarity * 100) + "%")
+gap = gap_cnt / len(output1)
+print("Gap : " + str(gap * 100) + "%")
+print("#==============================================================================#")
 
 c = lcs(testDNA, refDNA)
 print('Longest Common Subsequence: ', end="")
-print_lcs(testDNA, refDNA, c)
+list = print_lcs(testDNA, refDNA, c)
+str_list = ''.join(list)
+print(str_list)
+print("#==============================================================================#")
 
 # print(output1 + "\n" + output2)
