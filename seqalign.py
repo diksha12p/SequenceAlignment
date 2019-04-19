@@ -1,13 +1,17 @@
+import time as t
+import matplotlib.pyplot as plt
+
 # Values to be used for score calculation
 penalty_gap = -1
 award_match = 1
 penalty_mismatch = -1
 
+
 # Make a score matrix with these two sequences
-testDNA = "ccggggatgcgtgatgtttaagagttaaagcctggcctcccaaccgacat"
-refDNA = "agagcccatgttgtgcggtgtcgccatttcgggggccaaa"
-len_test = len(testDNA)
-len_ref = len(refDNA)
+# testDNA = "ccggggatgcgtgatgtttaagagttaaagcctggcctcccaaccgacat"
+# refDNA = "agagcccatgttgtgcggtgtcgccatttcgggggccaaa"
+# len_test = len(testDNA)
+# len_ref = len(refDNA)
 
 
 # The helper function to print out the score matrices
@@ -191,29 +195,70 @@ def string_compare(s1, s2):
     return count, gap_count
 
 
-# testDNA = ""
-print("#==============================================================================#")
-print("Sequence 1 : ", testDNA)
-print("Sequence 2 : ", refDNA)
-print("#==============================================================================#")
-output1, output2, score = needleman_wunsch(testDNA, refDNA)
-print("Globally aligned ref-DNA sequence : " + str(output1))
-print("Globally aligned test-DNA sequence : " + str(output2))
-print("#==============================================================================#")
-print_scores_matrix(score)
-cnt, gap_cnt = string_compare(output1, output2)
-similarity = cnt / len(output1)
-print("#==============================================================================#")
-print("Similarity : " + str(similarity * 100) + "%")
-gap = gap_cnt / len(output1)
-print("Gap : " + str(gap * 100) + "%")
-print("#==============================================================================#")
+if __name__ == '__main__':
+    list_test = []
+    with open("testDNA.txt", 'r') as f1:
+        for line in f1.readlines():
+            list_test.append(line)
 
-c = lcs(testDNA, refDNA)
-print('Longest Common Subsequence: ', end="")
-list = print_lcs(testDNA, refDNA, c)
-str_list = ''.join(list)
-print(str_list)
-print("#==============================================================================#")
+    list_ref = []
+    with open("refDNA.txt", 'r') as f2:
+        for line in f2.readlines():
+            list_ref.append(line)
+    end_time = []
+    gap_data = []
+    similarity_data = []
 
-# print(output1 + "\n" + output2)
+    for test, ref in zip(list_test, list_ref):
+        testDNA = test
+        refDNA = ref
+        len_test = len(testDNA)
+        len_ref = len(refDNA)
+        # testDNA = ""
+        print("#==============================================================================#")
+        print("Sequence 1 : ", testDNA)
+        print("Sequence 2 : ", refDNA)
+        print("#==============================================================================#")
+        start_time = t.time()
+        output1, output2, score = needleman_wunsch(testDNA, refDNA)
+        end_time.append((t.time() - start_time) * 1000)
+        print("Globally aligned ref-DNA sequence : " + str(output1))
+        print("Globally aligned test-DNA sequence : " + str(output2))
+        print("#==============================================================================#")
+        # print_scores_matrix(score)
+        cnt, gap_cnt = string_compare(output1, output2)
+        similarity = cnt / len(output1)
+        similarity_data.append(similarity)
+        print("#==============================================================================#")
+        print("Similarity : " + str(similarity * 100) + "%")
+        gap = gap_cnt / len(output1)
+        gap_data.append(gap)
+        print("Gap : " + str(gap * 100) + "%")
+        print("#==============================================================================#")
+
+        c = lcs(testDNA, refDNA)
+        print('Longest Common Subsequence: ', end="")
+        list = print_lcs(testDNA, refDNA, c)
+        str_list = ''.join(list)
+        print(str_list)
+        print("#==============================================================================#")
+
+        # print(output1 + "\n" + output2)
+    name = ['2', '4', '8', '16', '32', '64', '128', '256', '512']
+    for n, end in zip(name, end_time):
+        print(str(n) + " : " + str(end))
+
+    emboss_gap = []
+    emboss_similarity = []
+    with open("result.txt", 'r') as f:
+        for line in f.readlines():
+            s_data = line.split()[0]
+            s_data = s_data.replace("%", "")
+            g_data = line.split()[1]
+            g_data = g_data.replace("%", "")
+            emboss_similarity.append(s_data)
+            emboss_gap.append(g_data)
+    plt.plot(name, emboss_similarity, 'b*', name, similarity_data, 'g-')
+    plt.figure()
+    plt.plot(name, emboss_gap, 'b*', name, gap_data, 'g-')
+    plt.show()
