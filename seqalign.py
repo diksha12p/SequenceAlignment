@@ -248,7 +248,9 @@ if __name__ == '__main__':
     # plot functions
     plt.plot(name, emboss_similarity, color='red', label='EmbossSimilarity', marker='o')
     plt.plot(name, similarity_data, color='blue', label='Similarity', marker='*')
+    plt.legend()
     plt.figure()
     plt.plot(name, emboss_gap, color='red', label='EmbossGap', marker='o')
     plt.plot(name, gap_data, color='blue', label='Gap', marker='*')
+    plt.legend(loc='best')
     plt.show()
