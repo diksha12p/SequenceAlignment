@@ -187,6 +187,30 @@ def string_compare(s1, s2):
             count += 1
     return count, gap_count
 
+# Reference for Hamming and Edit Distance: https://nbviewer.jupyter.org/github/BenLangmead/comp-genomics-class/blob/master/notebooks/CG_DP_EditDist.ipynb 
+def hamming_distance(x, y):
+    ''' Return Hamming distance between x and y '''
+    assert len(x) == len(y)
+    nmm = 0
+    for i in range(0, len(x)):
+        if x[i] != y[i]:
+            nmm += 1
+    return nmm
+
+
+def bound_edit_distance(x, y):
+    ''' Return loose lower and upper bounds on the edit distance
+        between x and y in O(|x| + |y|) time. '''
+    if x == y: return 0, 0
+    if len(x) == 0: return len(y), len(y)
+    if len(y) == 0: return len(x), len(x)
+    diff = abs(len(x) - len(y))
+    lower = diff
+    if lower == 0 and x != y:
+        lower = 1
+    minlen = min(len(x), len(y))
+    upper = hamming_distance(x[:minlen], y[:minlen]) + diff
+    return lower, upper
 
 if __name__ == '__main__':
     list_test = []
@@ -231,6 +255,12 @@ if __name__ == '__main__':
 
         print('Longest Common Subsequence : ', end="")
         print(''.join(print_lcs(testDNA, refDNA, lcs(testDNA, refDNA))))
+        print("#" + "=" * 80 + "#")
+
+        #Print Hamming and Edit Distance
+        # print("#" + "=" * 80 + "#")
+        print("Hamming Distance : " + str(hamming_distance(output1, output2)))
+        print("Edit Distance : " + str(bound_edit_distance(output1, output2)))
         print("#" + "=" * 80 + "#")
 
     name = [2, 4, 8, 16, 32, 64, 128, 256, 512]
